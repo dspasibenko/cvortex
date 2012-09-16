@@ -71,6 +71,10 @@ public final class Id implements Serializable {
         return stringId;
     }    
     
+    public String getId() {
+        return this.toString();
+    }
+    
     private static boolean isValid(String id) {
         if (id.length() != 24) {
             return false;
