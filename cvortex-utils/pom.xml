@@ -9,7 +9,6 @@
   </parent>
   <groupId>org.cvortex</groupId>
   <artifactId>cvortex-utils</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
   <name>cVortex Utilities</name>
   <url>http://maven.apache.org</url>
   <properties>

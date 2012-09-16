@@ -29,4 +29,9 @@ public final class OfferParams {
         return priority;
     }
  
+    @Override
+    public String toString() {
+        return new StringBuilder().append("{timeout=").append(timeout).append(", priority=")
+                .append(priority).append("}").toString();
+    }
 }

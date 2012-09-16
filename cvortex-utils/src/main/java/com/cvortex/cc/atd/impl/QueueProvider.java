@@ -1,6 +1,6 @@
 package com.cvortex.cc.atd.impl;
 
-interface QueueProvider<P, T> {
+interface QueueProvider {
 
     QHolder<ProcessorHolder, TaskHolder> getNewQueue();
     

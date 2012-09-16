@@ -3,10 +3,16 @@ package com.cvortex.cc.atd.impl;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.cvortex.log.Logger;
+import org.cvortex.log.LoggerFactory;
+
+
 import com.cvortex.cc.atd.OfferParams;
 import com.cvortex.cc.atd.Task;
 
 class TaskHolder implements QEntry<ProcessorHolder> {
+    
+    private final Logger logger = LoggerFactory.getLogger(TaskHolder.class);
     
     private final Task task;
     
@@ -14,11 +20,11 @@ class TaskHolder implements QEntry<ProcessorHolder> {
     
     private final OfferParams offerParams;
     
-    private final Set<ProcessorHolder> blackList = new HashSet<ProcessorHolder>();
+    private Set<ProcessorHolder> blackList;
     
     private State state = State.QUEUE;
     
-    private enum State {
+    enum State {
         QUEUE, 
         OFFERED, 
         OFFERED_CANCEL, 
@@ -42,7 +48,7 @@ class TaskHolder implements QEntry<ProcessorHolder> {
 
     @Override
     public boolean isAcceptableFor(ProcessorHolder pHolder) {
-        return State.QUEUE.equals(state) && !blackList.contains(pHolder);
+        return State.QUEUE.equals(state) && (blackList == null || !blackList.contains(pHolder));
     }
 
     @Override
@@ -66,7 +72,7 @@ class TaskHolder implements QEntry<ProcessorHolder> {
         }
         if (State.OFFERED.equals(state)) {
             state = State.QUEUE;
-            blackList.add(pHolder);
+            addToBlackList(pHolder);
         } else if (State.OFFERED_CANCEL.equals(state)) {
             notifyAboutCancellation();
             state = State.REMOVE;
@@ -74,6 +80,7 @@ class TaskHolder implements QEntry<ProcessorHolder> {
             notifyAboutTimeout();
             state = State.REMOVE;
         }
+        logger.info("onOfferDone() for ", this, " pHolder: ", pHolder);
     }
 
     void cancel() {
@@ -83,6 +90,7 @@ class TaskHolder implements QEntry<ProcessorHolder> {
         } else if (State.OFFERED.equals(state)) {
             state = State.OFFERED_CANCEL;
         }
+        logger.info("On cancelled: ", this);
     }
     
     void onTimeout() {
@@ -92,6 +100,15 @@ class TaskHolder implements QEntry<ProcessorHolder> {
         } else if (State.OFFERED.equals(state)) {
             state = State.OFFERED_TIMEOUT;
         }
+        logger.info("On timeout: ", this);
+    }
+    
+    private void addToBlackList(ProcessorHolder pHolder) {
+        if (blackList == null) {
+            blackList = new HashSet<ProcessorHolder>();
+        }
+        blackList.add(pHolder);
+        logger.info("Add ", pHolder, " to black list for ", this);
     }
     
     private void assertState(State expectedState) {
@@ -105,6 +122,7 @@ class TaskHolder implements QEntry<ProcessorHolder> {
             atd.getExecEnvironment().execute(new Runnable() {
                 @Override
                 public void run() {
+                    logger.debug("Notify listener about cancellation");
                     offerParams.getResultListener().onCancelled();
                 }
             });
@@ -116,6 +134,7 @@ class TaskHolder implements QEntry<ProcessorHolder> {
             atd.getExecEnvironment().execute(new Runnable() {
                 @Override
                 public void run() {
+                    logger.debug("Notify listener about timeout");
                     offerParams.getResultListener().onTimeout();
                 }
             });
@@ -127,9 +146,17 @@ class TaskHolder implements QEntry<ProcessorHolder> {
             atd.getExecEnvironment().execute(new Runnable() {
                 @Override
                 public void run() {
+                    logger.debug("Notify listener about assignment.");
                     offerParams.getResultListener().onAssignedTo(pHolder.getProcessor());
                 }
             });
         }
+    }
+    
+    @Override
+    public String toString() {
+        return new StringBuilder().append("{task=").append(task).append(", offerParams=")
+                .append(offerParams).append(", blackListSize=").append(blackList == null ? 0 : blackList.size())
+                .append("}").toString();
     }
 }

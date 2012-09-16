@@ -1,6 +1,7 @@
 package com.cvortex.cc.atd.impl;
 
 import org.cvortex.env.TimeSourceProvider;
+import org.cvortex.util.TimeFormatter;
 
 import com.cvortex.cc.atd.Processor;
 
@@ -43,4 +44,10 @@ class ProcessorHolder implements QEntry<TaskHolder> {
         removed = true;
     }
     
+    @Override
+    public String toString() {
+        return new StringBuilder().append("{").append(processor).append(", removed=")
+                .append(removed).append(", addedAt=").append(TimeFormatter.toHostTimeView(createTimeMillis))
+                .append("}").toString();
+    }
 }

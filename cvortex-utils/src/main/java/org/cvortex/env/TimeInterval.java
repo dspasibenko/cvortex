@@ -2,6 +2,8 @@ package org.cvortex.env;
 
 import java.util.concurrent.TimeUnit;
 
+import org.cvortex.util.TimeFormatter;
+
 public final class TimeInterval {
 
     private final long timeInterval;
@@ -27,6 +29,12 @@ public final class TimeInterval {
     
     public TimeUnit timeUnit() {
         return unit;
+    }
+    
+    @Override
+    public String toString() {
+        return new StringBuilder().append("{interval=").append(TimeFormatter.toHumanView(timeIntervalMillis()))
+                .append(", unit=").append(unit).append("}").toString();
     }
     
 }

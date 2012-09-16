@@ -52,4 +52,9 @@ class QHolder<P extends QEntry<T>, T extends QEntry<P>> {
         return null;
     }
    
+    @Override
+    public String toString() {
+        return new StringBuilder().append("{pSet=").append(pSet).append(", tSet=")
+                .append(tSet).append("}").toString();
+    }
 }

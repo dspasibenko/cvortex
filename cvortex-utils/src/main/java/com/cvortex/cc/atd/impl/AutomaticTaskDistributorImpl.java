@@ -8,6 +8,8 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.cvortex.env.ExecutionEnvironment;
 import org.cvortex.env.TimeInterval;
+import org.cvortex.log.Logger;
+import org.cvortex.log.LoggerFactory;
 
 import com.cvortex.cc.atd.AutomaticTaskDistributor;
 import com.cvortex.cc.atd.OfferParams;
@@ -16,8 +18,16 @@ import com.cvortex.cc.atd.Processor;
 import com.cvortex.cc.atd.Task;
 import com.cvortex.cc.atd.TaskControl;
 
-final class AutomaticTaskDistributorImpl implements AutomaticTaskDistributor {
+/**
+ * An implementation of {@link AutomaticTaskDistributor} interface
+ * 
+ * @author Dmitry Spasibenko 
+ *
+ */
+class AutomaticTaskDistributorImpl implements AutomaticTaskDistributor {
 
+    private Logger logger = LoggerFactory.getLogger(AutomaticTaskDistributorImpl.class);
+    
     private Lock lock = new ReentrantLock();
     
     private Map<Processor, ProcessorHolder> processors = new HashMap<Processor, ProcessorHolder>();
@@ -43,6 +53,7 @@ final class AutomaticTaskDistributorImpl implements AutomaticTaskDistributor {
         public void cancel() {
             lock.lock();
             try {
+                logger.info("Cancelling task: ", tHolder);
                 future.cancel(false);
                 tHolder.cancel();
             } finally {
@@ -54,6 +65,7 @@ final class AutomaticTaskDistributorImpl implements AutomaticTaskDistributor {
         public void run() {
             lock.lock();
             try {
+                logger.info("Timeout for task: ", tHolder);
                 tHolder.onTimeout();
             } finally {
                 lock.unlock();
@@ -81,6 +93,7 @@ final class AutomaticTaskDistributorImpl implements AutomaticTaskDistributor {
 
         @Override
         public void run() {
+            logger.info("Offering task: ", tHolder, " to ", pHolder);
             boolean positive = offerer.offer(pHolder.getProcessor(), tHolder.getTask());
             lock.lock();
             try {
@@ -91,6 +104,7 @@ final class AutomaticTaskDistributorImpl implements AutomaticTaskDistributor {
         }
         
         private void onOfferDone(boolean positive) {
+            logger.info("Offer result is ", positive);
             tHolder.onOfferDone(pHolder, positive);
             if (!positive) {
                 if (tHolder.canBePlacedToQueue()) {
@@ -99,11 +113,13 @@ final class AutomaticTaskDistributorImpl implements AutomaticTaskDistributor {
                 if (pHolder.canBePlacedToQueue()) {
                     putProcessorHolderToQueues(pHolder);
                 }
+            } else {
+                processors.remove(pHolder.getProcessor());
             }
         }
     }
     
-    AutomaticTaskDistributorImpl(ExecutionEnvironment execEnvironment, Offerer<Processor, Task> offerer, QueueProvider<Processor, Task> queueProvider) {
+    AutomaticTaskDistributorImpl(ExecutionEnvironment execEnvironment, Offerer<Processor, Task> offerer, QueueProvider queueProvider) {
         this.execEnvironment = execEnvironment;
         this.offerer = offerer;
         this.mainQueue = queueProvider.getNewQueue();
@@ -115,6 +131,8 @@ final class AutomaticTaskDistributorImpl implements AutomaticTaskDistributor {
         try {
             if (!processors.containsKey(processor)) {
                 ProcessorHolder pHolder = new ProcessorHolder(processor);
+                processors.put(processor, pHolder);
+                logger.info("Register new processor", pHolder);
                 putProcessorHolderToQueues(pHolder);
             }
         } finally {
@@ -128,6 +146,7 @@ final class AutomaticTaskDistributorImpl implements AutomaticTaskDistributor {
         try {
             ProcessorHolder pHolder = processors.get(processor);
             if (pHolder != null) {
+                logger.info("Unregister new processor", pHolder);
                 pHolder.remove();
                 removeProcessorHolderFromQueues(pHolder);
             }
@@ -140,7 +159,8 @@ final class AutomaticTaskDistributorImpl implements AutomaticTaskDistributor {
     public TaskControl offer(Task task, OfferParams offerParams) {
         lock.lock();
         try {
-            TaskHolder tHolder = new TaskHolder(task, offerParams, this); //TODO: need to have offer params...
+            TaskHolder tHolder = new TaskHolder(task, offerParams, this);
+            logger.info("New task is offerred: ", tHolder);
             putTaskHolderToQueues(tHolder);
             return new TaskControlImpl(tHolder); 
         } finally {
@@ -149,18 +169,22 @@ final class AutomaticTaskDistributorImpl implements AutomaticTaskDistributor {
     }
     
     void putProcessorHolderToQueues(ProcessorHolder pHolder) {
+        logger.debug("Trying to put ", pHolder, " to queues");
         mainQueue.putP(pHolder);
     }
 
     void removeProcessorHolderFromQueues(ProcessorHolder pHolder) {
+        logger.debug("Removing ", pHolder, " from queues");
         mainQueue.removeP(pHolder);
     }
     
     void putTaskHolderToQueues(TaskHolder tHolder) {
+        logger.debug("Trying to put ", tHolder, " to queues");
         mainQueue.putT(tHolder);
     }
 
     void removeTaskHolderFromQueues(TaskHolder tHolder) {
+        logger.debug("Removing ", tHolder, " from queues");
         mainQueue.removeT(tHolder);
     }
     
