@@ -5,13 +5,15 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import org.cvortex.env.ExecutionEnvironment;
 import org.cvortex.env.ExecutionEnvironmentReal;
 import org.cvortex.env.TimeInterval;
+import org.cvortex.events.EventChannel;
 import org.cvortex.util.SilentSleep;
 import org.cvortex.util.testing.WatchDog;
 import org.junit.Assert;
 import org.junit.Test;
 
 import com.cvortex.cc.atd.OfferParams;
-import com.cvortex.cc.atd.OfferResultListener;
+import com.cvortex.cc.atd.OfferResult;
+import com.cvortex.cc.atd.OfferResultEvent;
 import com.cvortex.cc.atd.Offerer;
 import com.cvortex.cc.atd.Processor;
 import com.cvortex.cc.atd.Task;
@@ -23,35 +25,33 @@ public class AutomaticTaskDistributerImplTest extends Assert implements Offerer<
     
     private final ExecutionEnvironment execEnvironment = new ExecutionEnvironmentReal(executor);
     
-    private final AutomaticTaskDistributorImpl atd = new AutomaticTaskDistributorImpl(execEnvironment, this, this);
+    private final DefaultAutomaticTaskDistributor atd = new DefaultAutomaticTaskDistributor(execEnvironment, this, this);
     
     private boolean offerResult;
     
     private long offerDelay = 0L;
     
-    private ResultListener listener = new ResultListener();
+    private EventChannelMock channel = new EventChannelMock();
     
-    private class ResultListener implements OfferResultListener {
-        
+    private class EventChannelMock implements EventChannel {
         private Processor assignedTo;
         private boolean cancelled;
         private boolean timeout;
-
-        @Override
-        public void onAssignedTo(Processor processor) {
-            assignedTo = processor;
-        }
-
-        @Override
-        public void onCancelled() {
-            cancelled = true;
-        }
-
-        @Override
-        public void onTimeout() {
-            timeout = true;
-        }
         
+        @Override
+        public void publish(Object e) throws InterruptedException {
+            assertTrue(e instanceof OfferResultEvent);
+            final OfferResultEvent ore = (OfferResultEvent) e;
+            if (ore.getResult().equals(OfferResult.ASSIGNED)) {
+                assignedTo = ore.getProcessor();
+            }
+            if (ore.getResult().equals(OfferResult.CANCELLED)) {
+                cancelled = true;
+            }
+            if (ore.getResult().equals(OfferResult.TIMEOUT)) {
+                timeout = true;
+            }
+        }
     }
 
     @Override
@@ -158,7 +158,7 @@ public class AutomaticTaskDistributerImplTest extends Assert implements Offerer<
         atd.offer(new Task() {}, getOfferParams(0L));
         waitOffered(p);
         
-        listener.assignedTo = null;
+        channel.assignedTo = null;
         atd.offer(new Task() {}, getOfferParams(0L));
         waitTimeout(100L);
     }
@@ -174,7 +174,7 @@ public class AutomaticTaskDistributerImplTest extends Assert implements Offerer<
         atd.register(p);
         
         waitOffered(p);
-        listener.assignedTo = null;
+        channel.assignedTo = null;
         tc.cancel();
         waitCancelled();
     }
@@ -203,7 +203,7 @@ public class AutomaticTaskDistributerImplTest extends Assert implements Offerer<
         atd.offer(new Task() {}, getOfferParams(0L));
         waitTimeout(500L);
         
-        listener.timeout = false;
+        channel.timeout = false;
         offerResult = true;
         atd.offer(new Task() {}, getOfferParams(0L));
         waitOffered(p);
@@ -212,47 +212,47 @@ public class AutomaticTaskDistributerImplTest extends Assert implements Offerer<
     private void waitOffered(Processor p) {
         WatchDog wd = new WatchDog(10000L);
         try {
-            while (listener.assignedTo != p) {
+            while (channel.assignedTo != p) {
                 assertNull(SilentSleep.sleep(10L));
             }
         } finally {
             wd.done();
         }
-        assertFalse(listener.timeout);
-        assertFalse(listener.cancelled);
+        assertFalse(channel.timeout);
+        assertFalse(channel.cancelled);
     }
     
     private void waitTimeout(long maxWaitTime) {
         WatchDog wd = new WatchDog(maxWaitTime);
         try {
-            while (!listener.timeout) {
+            while (!channel.timeout) {
                 assertNull(SilentSleep.sleep(10L));
             }
         } finally {
             wd.done();
         }
-        assertNull(listener.assignedTo);
-        assertFalse(listener.cancelled);
+        assertNull(channel.assignedTo);
+        assertFalse(channel.cancelled);
     }
     
     private void waitCancelled() {
         WatchDog wd = new WatchDog(10000L);
         try {
-            while (!listener.cancelled) {
+            while (!channel.cancelled) {
                 assertNull(SilentSleep.sleep(10L));
             }
         } finally {
             wd.done();
         }
-        assertNull(listener.assignedTo);
-        assertFalse(listener.timeout);
+        assertNull(channel.assignedTo);
+        assertFalse(channel.timeout);
     }
     
     private OfferParams getOfferParams(long timeout) {
-        return new OfferParams(new TimeInterval(timeout), listener, 0);
+        return new OfferParams(new TimeInterval(timeout), channel, 0);
     }
     
     private OfferParams getOfferParams(long timeout, int priority) {
-        return new OfferParams(new TimeInterval(timeout), listener, priority);
+        return new OfferParams(new TimeInterval(timeout), channel, priority);
     }
 }

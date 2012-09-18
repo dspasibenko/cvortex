@@ -119,7 +119,7 @@ public class RingBuffer<T> implements Serializable {
 
     @Override
     public String toString() {
-        return new StringBuilder().append("RingBuffer: {size=").append(size).append(", capacity=").append(capacity())
+        return new StringBuilder().append("{size=").append(size).append(", capacity=").append(capacity())
                 .append(", tailIdx=").append(tailIdx).append(", values=").append(Arrays.toString(values)).append("}")
                 .toString();
     }

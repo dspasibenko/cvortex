@@ -24,9 +24,9 @@ import com.cvortex.cc.atd.TaskControl;
  * @author Dmitry Spasibenko 
  *
  */
-class AutomaticTaskDistributorImpl implements AutomaticTaskDistributor {
+class DefaultAutomaticTaskDistributor implements AutomaticTaskDistributor {
 
-    private Logger logger = LoggerFactory.getLogger(AutomaticTaskDistributorImpl.class);
+    private Logger logger = LoggerFactory.getLogger(DefaultAutomaticTaskDistributor.class);
     
     private Lock lock = new ReentrantLock();
     
@@ -119,7 +119,7 @@ class AutomaticTaskDistributorImpl implements AutomaticTaskDistributor {
         }
     }
     
-    AutomaticTaskDistributorImpl(ExecutionEnvironment execEnvironment, Offerer<Processor, Task> offerer, QueueProvider queueProvider) {
+    DefaultAutomaticTaskDistributor(ExecutionEnvironment execEnvironment, Offerer<Processor, Task> offerer, QueueProvider queueProvider) {
         this.execEnvironment = execEnvironment;
         this.offerer = offerer;
         this.mainQueue = queueProvider.getNewQueue();

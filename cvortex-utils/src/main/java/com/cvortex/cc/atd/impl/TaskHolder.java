@@ -8,6 +8,8 @@ import org.cvortex.log.LoggerFactory;
 
 
 import com.cvortex.cc.atd.OfferParams;
+import com.cvortex.cc.atd.OfferResult;
+import com.cvortex.cc.atd.OfferResultEvent;
 import com.cvortex.cc.atd.Task;
 
 class TaskHolder implements QEntry<ProcessorHolder> {
@@ -16,7 +18,7 @@ class TaskHolder implements QEntry<ProcessorHolder> {
     
     private final Task task;
     
-    private final AutomaticTaskDistributorImpl atd;
+    private final DefaultAutomaticTaskDistributor atd;
     
     private final OfferParams offerParams;
     
@@ -32,7 +34,7 @@ class TaskHolder implements QEntry<ProcessorHolder> {
         REMOVE;
     }
     
-    TaskHolder(Task task, OfferParams offerParams, AutomaticTaskDistributorImpl atd) {
+    TaskHolder(Task task, OfferParams offerParams, DefaultAutomaticTaskDistributor atd) {
         this.task = task;
         this.atd = atd;
         this.offerParams = offerParams;
@@ -117,39 +119,30 @@ class TaskHolder implements QEntry<ProcessorHolder> {
         }
     }
     
+    private void notifyListeners(OfferResultEvent result) {
+        try {
+            offerParams.getOfferResultChannel().publish(result);
+        } catch (InterruptedException e) {
+            logger.error("Got interrupted exception while publishing notification.");
+            Thread.currentThread().interrupt();
+        }
+    }
+    
     private void notifyAboutCancellation() {
-        if (offerParams.getResultListener() != null) {
-            atd.getExecEnvironment().execute(new Runnable() {
-                @Override
-                public void run() {
-                    logger.debug("Notify listener about cancellation");
-                    offerParams.getResultListener().onCancelled();
-                }
-            });
+        if (offerParams.getOfferResultChannel() != null) {
+            notifyListeners(new OfferResultEvent(task, null, OfferResult.CANCELLED));
         }
     }
     
     private void notifyAboutTimeout() {
-        if (offerParams.getResultListener() != null) {
-            atd.getExecEnvironment().execute(new Runnable() {
-                @Override
-                public void run() {
-                    logger.debug("Notify listener about timeout");
-                    offerParams.getResultListener().onTimeout();
-                }
-            });
+        if (offerParams.getOfferResultChannel() != null) {
+            notifyListeners(new OfferResultEvent(task, null, OfferResult.TIMEOUT));
         }
     }
 
     private void notifyAboutGoodOffer(final ProcessorHolder pHolder) {
-        if (offerParams.getResultListener() != null) {
-            atd.getExecEnvironment().execute(new Runnable() {
-                @Override
-                public void run() {
-                    logger.debug("Notify listener about assignment.");
-                    offerParams.getResultListener().onAssignedTo(pHolder.getProcessor());
-                }
-            });
+        if (offerParams.getOfferResultChannel() != null) {
+            notifyListeners(new OfferResultEvent(task, pHolder.getProcessor(), OfferResult.ASSIGNED));
         }
     }
     

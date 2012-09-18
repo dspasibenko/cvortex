@@ -1,19 +1,20 @@
 package com.cvortex.cc.atd;
 
 import org.cvortex.env.TimeInterval;
+import org.cvortex.events.EventChannel;
 
 public final class OfferParams {
 
     private final TimeInterval timeout;
     
-    private final OfferResultListener resultListener;
+    private final EventChannel offerResultChannel;
     
     private final int priority;
 
-    public OfferParams(TimeInterval timeout, OfferResultListener resultListener, int priority) {
+    public OfferParams(TimeInterval timeout, EventChannel offerResultChannel, int priority) {
         super();
         this.timeout = timeout;
-        this.resultListener = resultListener;
+        this.offerResultChannel = offerResultChannel;
         this.priority = priority;
     }
 
@@ -21,8 +22,8 @@ public final class OfferParams {
         return timeout;
     }
 
-    public OfferResultListener getResultListener() {
-        return resultListener;
+    public EventChannel getOfferResultChannel() {
+        return offerResultChannel;
     }
 
     public int getPriority() {
