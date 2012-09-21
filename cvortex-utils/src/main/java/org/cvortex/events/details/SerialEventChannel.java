@@ -9,8 +9,12 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.cvortex.collection.RingBuffer;
 import org.cvortex.events.EventChannel;
+import org.cvortex.log.Logger;
+import org.cvortex.log.LoggerFactory;
 
 class SerialEventChannel implements EventChannel {
+    
+    private final Logger logger;
 
     private final Lock lock = new ReentrantLock();
     
@@ -32,7 +36,8 @@ class SerialEventChannel implements EventChannel {
         PROCESSING_WAITING;
     }
     
-    SerialEventChannel(int capacity, Executor executor) {
+    SerialEventChannel(String name, int capacity, Executor executor) {
+        this.logger = LoggerFactory.getLogger(SerialEventChannel.class, name +"(%1s): %2s", state);
         this.events = new RingBuffer<Object>(capacity);
         this.executor = executor;
     }
@@ -62,8 +67,10 @@ class SerialEventChannel implements EventChannel {
     
     private void onNewEvent(Object e) throws InterruptedException {
         while (events.size() == events.capacity()) {
+            logger.debug("Event queue is full, waiting space. ", this);
             getCondition().await();
         }
+        logger.debug("New event to the channel: ", e);
         events.add(e);
     }
     
@@ -76,6 +83,7 @@ class SerialEventChannel implements EventChannel {
     
     private void runExecutorIfRequired() {
         if (State.WAITING.equals(state)) {
+            logger.trace("Running new execution thread.");
             executor.execute(new Runnable() {
                 @Override
                 public void run() {
@@ -89,13 +97,16 @@ class SerialEventChannel implements EventChannel {
     }
     
     private void notifyListeners() {
+        logger.trace("Notify listeners");
         Object e = getEvent();
         while (e != null) {
+            logger.debug("Notify listeners about the event: ", e);
             for (Subscriber subscriber: subscribers) {
                 subscriber.notify(e);
             }
             e = getEvent();
         }
+        logger.trace("No events in the queue, release the notification thread.");
     }
     
     private Object getEvent() {
@@ -107,6 +118,7 @@ class SerialEventChannel implements EventChannel {
             boolean needNotifyPublishThread = events.size() == events.capacity();
             Object result = events.removeFirst();
             if (needNotifyPublishThread) {
+                logger.debug("Notify publish threads about getting events from full queue.");
                 getCondition().signalAll();
             }
             return result;
@@ -127,8 +139,10 @@ class SerialEventChannel implements EventChannel {
         if (events.size() == 0 && waitingEventTimeoutMillis > 0L) {
             try {
                 state = State.PROCESSING_WAITING;
+                logger.trace("Waiting events in queue for ", waitingEventTimeoutMillis, "ms");
                 getCondition().await(waitingEventTimeoutMillis, TimeUnit.MILLISECONDS);
             } catch (InterruptedException ie) {
+                logger.warn("The notification thread is interrupted, leaving it ...");
                 return false;
             } finally {
                 state = State.PROCESSING;

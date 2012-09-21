@@ -24,7 +24,7 @@ public class SerialChannelTest extends Assert {
     
     @Before
     public void init() {
-        channel = new SerialEventChannel(10, executor);
+        channel = new SerialEventChannel("testChannel", 10, executor);
         channel.addSubscriber(new Subscriber(this, typeParser.getSubscriberTypeDetails(this.getClass())));
     }
     
