@@ -19,4 +19,8 @@ public interface EventChannel {
      */
     void publish(Object e) throws InterruptedException;
     
+    void addSubscriber(Object subscriber);
+
+    void removeSubscriber(Object subscriber);
+    
 }

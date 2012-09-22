@@ -58,6 +58,14 @@ public class TaskHolderTest extends Assert {
                 timeout = true;
             }
         }
+
+        @Override
+        public void addSubscriber(Object subscriber) {
+        }
+
+        @Override
+        public void removeSubscriber(Object subscriber) {
+        }
     }
 
     @Before

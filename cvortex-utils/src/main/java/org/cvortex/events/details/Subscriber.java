@@ -1,6 +1,7 @@
 package org.cvortex.events.details;
 
 import java.lang.reflect.Method;
+import java.util.Set;
 
 class Subscriber {
 
@@ -19,6 +20,10 @@ class Subscriber {
             return invoke(m, e);
         }
         return null;
+    }
+    
+    Set<Class<?>> getAcceptedEventsSet() {
+        return typeDetails.getEventsMap().keySet();
     }
     
     private Exception invoke(Method m, Object e) {

@@ -1,6 +1,5 @@
 package org.cvortex.events.details;
 
-import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
@@ -22,7 +21,7 @@ class SerialEventChannel implements EventChannel {
     
     private State state = State.WAITING;
     
-    private final CopyOnWriteArraySet<Subscriber> subscribers = new CopyOnWriteArraySet<Subscriber>();
+    private final SubscribersRegistry subscribersRegistry;
     
     private final RingBuffer<Object> events;
     
@@ -36,10 +35,11 @@ class SerialEventChannel implements EventChannel {
         PROCESSING_WAITING;
     }
     
-    SerialEventChannel(String name, int capacity, Executor executor) {
+    SerialEventChannel(String name, int capacity, Executor executor, SubscribersRegistry subscribersRegistry) {
         this.logger = LoggerFactory.getLogger(SerialEventChannel.class, name +"(%1s): %2s", state);
         this.events = new RingBuffer<Object>(capacity);
         this.executor = executor;
+        this.subscribersRegistry = subscribersRegistry;
     }
     
     void setWaitingTimeout(long millis) {
@@ -57,12 +57,14 @@ class SerialEventChannel implements EventChannel {
         }
     }
     
-    void addSubscriber(Subscriber subscriber) {
-        subscribers.add(subscriber);
+    @Override
+    public void addSubscriber(Object subscriber) {
+        subscribersRegistry.subscribe(subscriber);
     }
     
-    void removeSubscriber(Subscriber subscriber) {
-        subscribers.remove(subscriber);
+    @Override
+    public void removeSubscriber(Object subscriber) {
+        subscribersRegistry.unsubscribe(subscriber);
     }
     
     private void onNewEvent(Object e) throws InterruptedException {
@@ -101,7 +103,7 @@ class SerialEventChannel implements EventChannel {
         Object e = getEvent();
         while (e != null) {
             logger.debug("Notify listeners about the event: ", e);
-            for (Subscriber subscriber: subscribers) {
+            for (Subscriber subscriber: subscribersRegistry.getSubscribers()) {
                 subscriber.notify(e);
             }
             e = getEvent();
@@ -119,7 +121,7 @@ class SerialEventChannel implements EventChannel {
             Object result = events.removeFirst();
             if (needNotifyPublishThread) {
                 logger.debug("Notify publish threads about getting events from full queue.");
-                getCondition().signalAll();
+                 getCondition().signalAll();
             }
             return result;
         } finally {
@@ -153,7 +155,8 @@ class SerialEventChannel implements EventChannel {
     
     @Override
     public String toString() {
-        return new StringBuilder().append("{state=").append(state).append(", subscribers=").append(subscribers.size())
+        return new StringBuilder().append("{state=").append(state).append(", subscribers=")
+                .append(subscribersRegistry.getSubscribers().size())
                 .append(", events=").append(events.size()).append("}").toString();
     }
 }

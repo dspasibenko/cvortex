@@ -52,6 +52,14 @@ public class AutomaticTaskDistributerImplTest extends Assert implements Offerer<
                 timeout = true;
             }
         }
+
+        @Override
+        public void addSubscriber(Object subscriber) {
+        }
+
+        @Override
+        public void removeSubscriber(Object subscriber) {
+        }
     }
 
     @Override
