@@ -1,4 +1,4 @@
-package org.cvortex.util.id;
+package org.cvortex.util;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -7,7 +7,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 
-import org.cvortex.util.id.Id;
+import org.cvortex.util.Id;
 import org.junit.Assert;
 import org.junit.Test;
 

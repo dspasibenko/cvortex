@@ -1,4 +1,4 @@
-package org.cvortex.util.id;
+package org.cvortex.util;
 
 import java.io.Serializable;
 import java.net.NetworkInterface;
