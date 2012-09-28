@@ -45,7 +45,7 @@ public class TaskHolderTest extends Assert {
     private class EventChannelMock implements EventChannel {
 
         @Override
-        public void publish(Object e) throws InterruptedException {
+        public boolean publish(Object e)  {
             assertTrue(e instanceof OfferResultEvent);
             final OfferResultEvent ore = (OfferResultEvent) e;
             if (ore.getResult().equals(OfferResult.ASSIGNED)) {
@@ -57,6 +57,7 @@ public class TaskHolderTest extends Assert {
             if (ore.getResult().equals(OfferResult.TIMEOUT)) {
                 timeout = true;
             }
+            return true;
         }
 
         @Override

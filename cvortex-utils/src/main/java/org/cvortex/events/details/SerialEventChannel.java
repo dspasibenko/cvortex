@@ -47,14 +47,19 @@ class SerialEventChannel implements EventChannel {
     }
     
     @Override
-    public void publish(Object e) throws InterruptedException {
+    public boolean publish(Object e) {
         lock.lock();
         try {
             onNewEvent(e);
             runExecutorIfRequired();
+            return true;
+        } catch(InterruptedException ie) {
+            logger.info("Could not publish the event ", e, " invoker is interrupted ");
+            Thread.currentThread().interrupt();
         } finally {
             lock.unlock();
         }
+        return false;
     }
     
     @Override

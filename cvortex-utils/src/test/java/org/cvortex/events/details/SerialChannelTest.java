@@ -67,10 +67,7 @@ public class SerialChannelTest extends Assert {
                 public void run() {
                     for (int i = 0; i < 20; i++) {
                         counter.addAndGet(1);
-                        try {
-                            channel.publish(new Integer(i));
-                        } catch (InterruptedException e) {
-                        }
+                        channel.publish(new Integer(i));
                     }
                 }
             });

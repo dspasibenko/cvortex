@@ -39,7 +39,7 @@ public class AutomaticTaskDistributerImplTest extends Assert implements Offerer<
         private boolean timeout;
         
         @Override
-        public void publish(Object e) throws InterruptedException {
+        public boolean publish(Object e) {
             assertTrue(e instanceof OfferResultEvent);
             final OfferResultEvent ore = (OfferResultEvent) e;
             if (ore.getResult().equals(OfferResult.ASSIGNED)) {
@@ -51,6 +51,7 @@ public class AutomaticTaskDistributerImplTest extends Assert implements Offerer<
             if (ore.getResult().equals(OfferResult.TIMEOUT)) {
                 timeout = true;
             }
+            return true;
         }
 
         @Override

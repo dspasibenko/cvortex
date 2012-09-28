@@ -18,7 +18,11 @@ public class EventChannelFactory {
     }
     
     public EventChannel createSerialEventChannel(String name) {
-        return new SerialEventChannel(name, serialChannelCapacity, executor, new SubscribersRegistry(typeParser));
+        return createSerialEventChannel(name, serialChannelCapacity);
+    }
+    
+    public EventChannel createSerialEventChannel(String name, int capacity) {
+        return new SerialEventChannel(name, capacity, executor, new SubscribersRegistry(typeParser));
     }
     
 }

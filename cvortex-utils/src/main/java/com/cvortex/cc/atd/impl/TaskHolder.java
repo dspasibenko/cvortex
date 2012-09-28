@@ -120,11 +120,8 @@ class TaskHolder implements QEntry<ProcessorHolder> {
     }
     
     private void notifyListeners(OfferResultEvent result) {
-        try {
-            offerParams.getOfferResultChannel().publish(result);
-        } catch (InterruptedException e) {
-            logger.error("Got interrupted exception while publishing notification.");
-            Thread.currentThread().interrupt();
+        if (!offerParams.getOfferResultChannel().publish(result)) {
+            logger.error("Could not publish notification: ", result);
         }
     }
     
