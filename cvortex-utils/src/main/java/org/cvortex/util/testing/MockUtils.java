@@ -103,6 +103,19 @@ public final class MockUtils {
         }
     }
     
+    public static <E> E createInstance(Class<E> clazz) {
+        Constructor<E> c = getDefaultConstructor(clazz);
+        if (c == null) {
+            throw new IllegalArgumentException("No default constructor for " + clazz);
+        }
+        try {
+            c.setAccessible(true);
+            return (E) c.newInstance();
+        } catch (Exception ex) {
+            throw new RuntimeException("Cannot create an instance of " + clazz, ex);
+        }
+    }
+    
     public static <E> String getAnnotatedField(Class<E> clazz, Class<? extends Annotation> annotationClass) {
         Field[] fields = clazz.getDeclaredFields();
         for (Field f : fields) {

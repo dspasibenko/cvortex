@@ -15,14 +15,14 @@ public class LoggerFactory {
      * @return
      */
     public static <T> Logger getLogger(Class<T> clazz, String formatString, Object marker) {
-        return new Slf4jLoggerAdapter(org.slf4j.LoggerFactory.getLogger(clazz), formatString, marker);
+        return new Log4jLoggerAdapter(org.apache.log4j.Logger.getLogger(clazz), formatString, marker);
     }
     
     public static <T> Logger getLogger(Class<T> clazz) {
-        return new Slf4jLoggerAdapter(org.slf4j.LoggerFactory.getLogger(clazz), null, null);
+        return new Log4jLoggerAdapter(org.apache.log4j.Logger.getLogger(clazz), null, null);
     }
     
     public static Logger getLogger(String name, String formatString, Object marker) {
-        return new Slf4jLoggerAdapter(org.slf4j.LoggerFactory.getLogger(name), formatString, marker);
+        return new Log4jLoggerAdapter(org.apache.log4j.Logger.getLogger(name), formatString, marker);
     }
 }
