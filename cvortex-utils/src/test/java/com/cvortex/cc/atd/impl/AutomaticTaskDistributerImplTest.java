@@ -19,7 +19,7 @@ import com.cvortex.cc.atd.Processor;
 import com.cvortex.cc.atd.Task;
 import com.cvortex.cc.atd.TaskControl;
 
-public class AutomaticTaskDistributerImplTest extends Assert implements Offerer<Processor, Task>, QueueProvider {
+public class AutomaticTaskDistributerImplTest extends Assert implements Offerer, QueueProvider {
 
     private final ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1);
     

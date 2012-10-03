@@ -1,7 +1,7 @@
 package com.cvortex.cc.atd;
 
-public interface Offerer<P extends Processor, T extends Task> {
+public interface Offerer {
 
-    boolean offer(P p, T t);
+    boolean offer(Processor p, Task t);
     
 }

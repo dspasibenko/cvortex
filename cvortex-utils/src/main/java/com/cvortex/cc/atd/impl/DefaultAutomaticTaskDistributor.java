@@ -34,7 +34,7 @@ class DefaultAutomaticTaskDistributor implements AutomaticTaskDistributor {
     
     private final ExecutionEnvironment execEnvironment;
     
-    private final Offerer<Processor, Task> offerer;
+    private final Offerer offerer;
     
     private final QHolder<ProcessorHolder, TaskHolder> mainQueue;
     
@@ -119,7 +119,7 @@ class DefaultAutomaticTaskDistributor implements AutomaticTaskDistributor {
         }
     }
     
-    DefaultAutomaticTaskDistributor(ExecutionEnvironment execEnvironment, Offerer<Processor, Task> offerer, QueueProvider queueProvider) {
+    DefaultAutomaticTaskDistributor(ExecutionEnvironment execEnvironment, Offerer offerer, QueueProvider queueProvider) {
         this.execEnvironment = execEnvironment;
         this.offerer = offerer;
         this.mainQueue = queueProvider.getNewQueue();
@@ -146,7 +146,7 @@ class DefaultAutomaticTaskDistributor implements AutomaticTaskDistributor {
         try {
             ProcessorHolder pHolder = processors.get(processor);
             if (pHolder != null) {
-                logger.info("Unregister new processor", pHolder);
+                logger.info("Unregister processor", pHolder);
                 pHolder.remove();
                 removeProcessorHolderFromQueues(pHolder);
             }
