@@ -11,7 +11,7 @@ class ProcessorHolder implements QEntry<TaskHolder> {
     
     private boolean removed;
     
-    private final long createTimeMillis = TimeSourceProvider.currentTimeMillis();
+    private final long createTimeMillis = TimeSourceProvider.getTimeSource().currentTimeMillis();
     
     ProcessorHolder(Processor processor) {
         this.processor = processor;

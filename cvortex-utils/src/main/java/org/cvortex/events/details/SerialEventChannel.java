@@ -36,7 +36,7 @@ class SerialEventChannel implements EventChannel {
     }
     
     SerialEventChannel(String name, int capacity, Executor executor, SubscribersRegistry subscribersRegistry) {
-        this.logger = LoggerFactory.getLogger(SerialEventChannel.class, name +"(%1s): %2s", state);
+        this.logger = LoggerFactory.getLogger(SerialEventChannel.class, name +"(%1$s): %2$s", state);
         this.events = new RingBuffer<Object>(capacity);
         this.executor = executor;
         this.subscribersRegistry = subscribersRegistry;

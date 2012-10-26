@@ -37,7 +37,7 @@ public final class SimpleTransaction {
     }
 
     public SimpleTransaction(String transactionName) {
-        this.logger = LoggerFactory.getLogger(SimpleTransaction.class, transactionName + " %2s", null);
+        this.logger = LoggerFactory.getLogger(SimpleTransaction.class, transactionName + " %2$s", null);
         this.name = transactionName;
         this.constructThreadId = Thread.currentThread().getId();
     }
