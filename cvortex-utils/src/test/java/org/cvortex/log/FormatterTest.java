@@ -91,6 +91,7 @@ public class FormatterTest {
         long endTime = System.currentTimeMillis() + periodMs;
 
         while (System.currentTimeMillis() < endTime) {
+            @SuppressWarnings("unused")
             String s = "This" + iterations + 3.5 + System.currentTimeMillis() + "text" + iterations + 123;
             iterations++;
         }
