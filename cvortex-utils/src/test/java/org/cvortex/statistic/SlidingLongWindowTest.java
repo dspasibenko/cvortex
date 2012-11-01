@@ -3,6 +3,8 @@ package org.cvortex.statistic;
 import static org.mockito.Mockito.*;
 import static junit.framework.Assert.*;
 
+import java.util.Iterator;
+
 import org.cvortex.env.TimeSource;
 import org.cvortex.util.testing.MockUtils;
 import org.junit.Before;
@@ -70,28 +72,15 @@ public class SlidingLongWindowTest {
     }
     
     @Test
-    public void decreaseSize() {
+    public void collection() {
         when(timeSource.currentTimeMillis()).thenReturn(1L);
         window.add(1L);
-        when(timeSource.currentTimeMillis()).thenReturn(6L);
-        window.add(2L);
         when(timeSource.currentTimeMillis()).thenReturn(10L);
-        window.add(3L);
-        assertEquals(new Long(6L), new Long(window.getSum()));
-        window.setSize(10);
-        when(timeSource.currentTimeMillis()).thenReturn(12L);
-        assertEquals(new Long(5L), new Long(window.getSum()));
-        window.setSize(5);
-        assertEquals(new Long(3L), new Long(window.getSum()));
-    }
-    
-    @Test
-    public void increaseSize() {
-        when(timeSource.currentTimeMillis()).thenReturn(1L);
         window.add(1L);
-        assertEquals(new Long(1L), new Long(window.getSum()));
-        window.setSize(20);
-        when(timeSource.currentTimeMillis()).thenReturn(18L);
-        assertEquals(new Long(1L), new Long(window.getSum()));
+        
+        Iterator<IntervalledValue<Long>> it = window.getValues().iterator();
+        assertEquals(0L, it.next().getTime());
+        assertEquals(10L, it.next().getTime());
+        assertFalse(it.hasNext());
     }
 }
