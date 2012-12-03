@@ -6,7 +6,7 @@ public class LoggerFactory {
     }
 
     /**
-     * Returns Logger instance which wraps Slf4j Logger with a purpose to add some formatting there.
+     * Returns Logger instance which wraps Log4j Logger with a purpose to add some formatting there.
      * The parameters will be fed to <code>String.format(formatString, marker, message)</code> which
      * result is printed to the log then.   
      * @param clazz
