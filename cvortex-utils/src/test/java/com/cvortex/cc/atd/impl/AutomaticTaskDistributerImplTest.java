@@ -5,9 +5,9 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import org.cvortex.env.ExecutionEnvironment;
 import org.cvortex.env.ExecutionEnvironmentReal;
 import org.cvortex.env.TimeInterval;
-import org.cvortex.events.EventChannel;
 import org.cvortex.util.SilentSleep;
 import org.cvortex.util.testing.WatchDog;
+import org.jrivets.event.EventChannel;
 import org.junit.Assert;
 import org.junit.Test;
 

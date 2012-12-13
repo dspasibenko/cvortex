@@ -1,5 +1,7 @@
 package org.cvortex.env;
 
+import org.jrivets.env.TimeSource;
+
 public final class TimeSourceProvider {
 
     private static TimeSource localHostTimeSource = new TimeSource() {

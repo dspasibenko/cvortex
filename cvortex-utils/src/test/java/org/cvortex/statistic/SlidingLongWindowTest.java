@@ -5,8 +5,8 @@ import static junit.framework.Assert.*;
 
 import java.util.Iterator;
 
-import org.cvortex.env.TimeSource;
 import org.cvortex.util.testing.MockUtils;
+import org.jrivets.env.TimeSource;
 import org.junit.Before;
 import org.junit.Test;
 

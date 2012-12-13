@@ -1,7 +1,7 @@
 package com.cvortex.cc.atd;
 
 import org.cvortex.env.TimeInterval;
-import org.cvortex.events.EventChannel;
+import org.jrivets.event.EventChannel;
 
 public final class OfferParams {
 

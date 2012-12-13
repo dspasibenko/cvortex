@@ -2,15 +2,14 @@ package org.cvortex.events.details;
 
 import java.util.concurrent.Executor;
 
-import org.cvortex.events.EventChannel;
+import org.jrivets.event.EventChannel;
+import org.jrivets.event.SerialEventChannel;
 
 public class EventChannelFactory {
 
     private final Executor executor;
     
     private final int serialChannelCapacity;
-    
-    private final SubscriberTypeParser typeParser = new SubscriberTypeParser();
     
     public EventChannelFactory(Executor executor, int serialChannelCapacity) {
         this.executor = executor;
@@ -22,7 +21,7 @@ public class EventChannelFactory {
     }
     
     public EventChannel createSerialEventChannel(String name, int capacity) {
-        return new SerialEventChannel(name, capacity, executor, new SubscribersRegistry(typeParser));
+        return new SerialEventChannel(name, capacity, executor);
     }
     
 }
