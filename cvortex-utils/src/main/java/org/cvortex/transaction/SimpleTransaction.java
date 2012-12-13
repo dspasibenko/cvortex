@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
 import java.util.List;
 
-import org.cvortex.log.Logger;
-import org.cvortex.log.LoggerFactory;
+import org.jrivets.log.Logger;
+import org.jrivets.log.LoggerFactory;
 
 /**
  * Contract: <code>Action.doAction()</code> are executed in submit order. If the method

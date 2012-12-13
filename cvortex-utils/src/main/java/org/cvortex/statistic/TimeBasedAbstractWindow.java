@@ -1,7 +1,7 @@
 package org.cvortex.statistic;
 
-import org.cvortex.collection.RingBuffer;
 import org.cvortex.collection.Tuple;
+import org.jrivets.collection.RingBuffer;
 
 public abstract class TimeBasedAbstractWindow<T> {
 

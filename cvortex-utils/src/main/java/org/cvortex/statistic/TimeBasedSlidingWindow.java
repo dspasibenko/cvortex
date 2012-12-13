@@ -3,9 +3,9 @@ package org.cvortex.statistic;
 import java.util.Collection;
 import java.util.Collections;
 
-import org.cvortex.collection.RingBuffer;
 import org.cvortex.env.TimeSource;
 import org.cvortex.env.TimeSourceProvider;
+import org.jrivets.collection.RingBuffer;
 
 public abstract class TimeBasedSlidingWindow<T> {
    

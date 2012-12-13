@@ -5,8 +5,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.cvortex.events.annotations.OnEvent;
-import org.cvortex.log.Logger;
-import org.cvortex.log.LoggerFactory;
+import org.jrivets.log.Logger;
+import org.jrivets.log.LoggerFactory;
 
 final class SubscriberTypeParser {
 

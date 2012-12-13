@@ -3,8 +3,8 @@ package com.cvortex.cc.atd.impl;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.cvortex.log.Logger;
-import org.cvortex.log.LoggerFactory;
+import org.jrivets.log.Logger;
+import org.jrivets.log.LoggerFactory;
 
 
 import com.cvortex.cc.atd.OfferParams;
@@ -145,7 +145,7 @@ class TaskHolder implements QEntry<ProcessorHolder> {
     
     @Override
     public String toString() {
-        return new StringBuilder().append("{task=").append(task).append(", offerParams=")
+        return new StringBuilder().append("{task=").append(task).append(", state=").append(state).append(", offerParams=")
                 .append(offerParams).append(", blackListSize=").append(blackList == null ? 0 : blackList.size())
                 .append("}").toString();
     }

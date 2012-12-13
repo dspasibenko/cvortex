@@ -8,8 +8,8 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.cvortex.env.ExecutionEnvironment;
 import org.cvortex.env.TimeInterval;
-import org.cvortex.log.Logger;
-import org.cvortex.log.LoggerFactory;
+import org.jrivets.log.Logger;
+import org.jrivets.log.LoggerFactory;
 
 import com.cvortex.cc.atd.AutomaticTaskDistributor;
 import com.cvortex.cc.atd.OfferParams;

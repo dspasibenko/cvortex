@@ -6,10 +6,10 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.cvortex.collection.RingBuffer;
 import org.cvortex.events.EventChannel;
-import org.cvortex.log.Logger;
-import org.cvortex.log.LoggerFactory;
+import org.jrivets.collection.RingBuffer;
+import org.jrivets.log.Logger;
+import org.jrivets.log.LoggerFactory;
 
 class SerialEventChannel implements EventChannel {
     
