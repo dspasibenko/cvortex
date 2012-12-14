@@ -144,7 +144,7 @@ class DefaultAutomaticTaskDistributor implements AutomaticTaskDistributor {
     public void unRegister(Processor processor) {
         lock.lock();
         try {
-            ProcessorHolder pHolder = processors.get(processor);
+            ProcessorHolder pHolder = processors.remove(processor);
             if (pHolder != null) {
                 logger.info("Unregister processor", pHolder);
                 pHolder.remove();
